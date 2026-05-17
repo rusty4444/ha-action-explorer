@@ -22,4 +22,5 @@ jobs:
       - run: npm run check
       - run: python -m py_compile custom_components/action_explorer/*.py
       - run: git diff --exit-code -- custom_components/action_explorer/www/action-explorer-panel.js
+      - run: rm -rf custom_components/action_explorer/__pycache__
       - run: find custom_components/action_explorer \( -name '__pycache__' -o -name '*.pyc' -o -name '.DS_Store' \) -print -quit | (! grep .)
