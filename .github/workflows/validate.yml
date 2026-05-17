@@ -1,0 +1,25 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m json.tool hacs.json > /dev/null
+      - run: python -m json.tool custom_components/action_explorer/manifest.json > /dev/null
+      - run: npm ci
+      - run: npm run check
+      - run: python -m py_compile custom_components/action_explorer/*.py
+      - run: git diff --exit-code -- custom_components/action_explorer/www/action-explorer-panel.js
+      - run: find custom_components/action_explorer \( -name '__pycache__' -o -name '*.pyc' -o -name '.DS_Store' \) -print -quit | (! grep .)

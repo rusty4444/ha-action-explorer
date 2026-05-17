@@ -1,0 +1,16 @@
+{
+  "name": "ha-action-explorer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Home Assistant custom panel for exploring entity and device actions.",
+  "scripts": {
+    "build": "esbuild src/action-explorer-panel.js --bundle --format=esm --target=es2022 --outfile=custom_components/action_explorer/www/action-explorer-panel.js",
+    "check": "npm run build && node --test test/*.test.js && python3 -m unittest discover -s test -p 'test_*.py'",
+    "screenshot": "node scripts/make-screenshot.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "esbuild": "0.25.12"
+  },
+  "type": "module"
+}

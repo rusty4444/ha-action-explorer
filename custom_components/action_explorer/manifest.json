@@ -1,0 +1,11 @@
+{
+  "domain": "action_explorer",
+  "name": "Action Explorer",
+  "codeowners": ["@rusty4444"],
+  "config_flow": true,
+  "dependencies": ["frontend", "http"],
+  "documentation": "https://github.com/rusty4444/ha-action-explorer",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/rusty4444/ha-action-explorer/issues",
+  "version": "0.1.0"
+}

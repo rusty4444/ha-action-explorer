@@ -1,0 +1,14 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Action Explorer",
+        "description": "Install the Action Explorer side panel. Only one instance is needed.",
+        "data": {}
+      }
+    },
+    "abort": {
+      "single_instance_allowed": "Action Explorer is already configured."
+    }
+  }
+}
