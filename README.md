@@ -62,3 +62,5 @@ The built panel bundle is committed at `custom_components/action_explorer/www/ac
 - Script generation alongside automation snippets.
 - One-click copy buttons and import guidance.
 - Optional admin-only mode to save generated automations directly.
+
+This project was developed with the assistance of AI tools.
