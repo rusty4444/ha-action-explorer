@@ -12,5 +12,5 @@
   "documentation": "https://github.com/rusty4444/ha-action-explorer",
   "iot_class": "calculated",
   "issue_tracker": "https://github.com/rusty4444/ha-action-explorer/issues",
-  "version": "0.1.2"
+  "version": "0.1.3"
 }
