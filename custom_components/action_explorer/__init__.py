@@ -12,7 +12,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
-from .const import DOMAIN, PANEL_NAME, PANEL_URL_PATH, STATIC_URL
+from .const import DOMAIN, PANEL_NAME, PANEL_URL_PATH, STATIC_URL, VERSION
 
 PLATFORMS: list[str] = []
 
@@ -263,7 +263,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         webcomponent_name=PANEL_NAME,
         sidebar_title="Action Explorer",
         sidebar_icon="mdi:gesture-tap-button",
-        module_url=f"{STATIC_URL}/action-explorer-panel.js",
+        module_url=f"{STATIC_URL}/action-explorer-panel.js?v={VERSION}",
         embed_iframe=False,
         require_admin=False,
         config={"apiBase": "/action_explorer"},
