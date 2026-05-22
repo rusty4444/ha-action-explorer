@@ -39,6 +39,19 @@ var ActionExplorerPanel = class extends HTMLElement {
   apiBase() {
     return this._panelConfig?.config?.apiBase || API_BASE;
   }
+  _formatError(err) {
+    if (err && typeof err === "object") {
+      if (err.status_code) {
+        let msg = `HTTP ${err.status_code}`;
+        if (err.error) msg += `: ${err.error}`;
+        else if (err.body) msg += `: ${typeof err.body === "object" ? JSON.stringify(err.body).slice(0, 200) : err.body}`;
+        return msg;
+      }
+      if (err.error) return err.error;
+      if (err.message) return err.message;
+    }
+    return String(err);
+  }
   async loadEntities() {
     if (!this._hass) return;
     this._error = "";
@@ -47,8 +60,7 @@ var ActionExplorerPanel = class extends HTMLElement {
       const response = await this._hass.callApi("GET", `${this.apiBase()}/entities${params}`);
       this._entities = response.entities || [];
     } catch (err) {
-      const detail = err.status ? `HTTP ${err.status}${err.body ? `: ${typeof err.body === "object" ? JSON.stringify(err.body).slice(0, 200) : err.body}` : ""}` : err.message || String(err);
-      this._error = `Could not load entities: ${detail}`;
+      this._error = `Could not load entities: ${this._formatError(err)}`;
     }
     this.render();
   }
@@ -62,7 +74,7 @@ var ActionExplorerPanel = class extends HTMLElement {
       this._actions = response.actions || [];
     } catch (err) {
       this._actions = [];
-      this._error = `Could not load actions: ${err.message || err}`;
+      this._error = `Could not load actions: ${this._formatError(err)}`;
     }
     this.render();
   }
@@ -79,7 +91,7 @@ var ActionExplorerPanel = class extends HTMLElement {
       this._automationYaml = response.automation_yaml || "";
     } catch (err) {
       this._automationYaml = "";
-      this._error = `Could not generate automation: ${err.message || err}`;
+      this._error = `Could not generate automation: ${this._formatError(err)}`;
     }
     this.render();
   }
