@@ -1,6 +1,6 @@
 import { formatFieldCount } from "./utils.js";
 
-const API_BASE = "/api/action_explorer";
+const API_BASE = "/action_explorer";
 
 export function createElement(tag, className, text) {
   const node = document.createElement(tag);
@@ -48,7 +48,8 @@ class ActionExplorerPanel extends HTMLElement {
       const response = await this._hass.callApi("GET", `${this.apiBase()}/entities${params}`);
       this._entities = response.entities || [];
     } catch (err) {
-      this._error = `Could not load entities: ${err.message || err}`;
+      const detail = err.status ? `HTTP ${err.status}${err.body ? `: ${typeof err.body === 'object' ? JSON.stringify(err.body).slice(0, 200) : err.body}` : ""}` : err.message || String(err);
+      this._error = `Could not load entities: ${detail}`;
     }
     this.render();
   }

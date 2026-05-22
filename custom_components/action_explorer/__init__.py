@@ -266,7 +266,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         module_url=f"{STATIC_URL}/action-explorer-panel.js",
         embed_iframe=False,
         require_admin=False,
-        config={"apiBase": "/api/action_explorer"},
+        config={"apiBase": "/action_explorer"},
     )
     return True
 
