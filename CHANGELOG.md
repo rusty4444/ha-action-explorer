@@ -29,3 +29,16 @@
 - Entity list scroll position resetting to top when `render()` rebuilds the DOM.
   `render()` now captures `scrollTop` before `shadowRoot.replaceChildren()` and
   restores it immediately after, so scrolling is preserved across search re-renders.
+
+
+## [0.1.5] – 2026-05-22
+
+### Fixed
+- Entity list scroll position kept resetting to top.
+  Root cause: `set hass()` triggered a full `render()` on every HA state
+  update, calling `shadowRoot.replaceChildren()` which destroyed and
+  recreated the entire DOM. Changed to one-time layout in `_buildLayout()`
+  with in-place data updates via `_populateEntityList()` and
+  `_populateActionCard()` that only modify the text content of specific
+  container elements. The `<div class="list">` element is never replaced,
+  so its scroll position is naturally preserved.

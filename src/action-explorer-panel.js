@@ -20,16 +20,20 @@ class ActionExplorerPanel extends HTMLElement {
     this._automationYaml = "";
     this._error = "";
     this._query = "";
-    this._loaded = false;
+    this._listEl = null;
+    this._actionBodyEl = null;
+    this._actionOutputEl = null;
+    this._errorEl = null;
+    this._built = false;
   }
 
   set hass(hass) {
     this._hass = hass;
-    if (!this._loaded) {
-      this._loaded = true;
+    if (!this._built) {
+      this._buildLayout();
+      this._built = true;
       this.loadEntities();
     }
-    this.render();
   }
 
   set panel(config) {
@@ -64,7 +68,7 @@ class ActionExplorerPanel extends HTMLElement {
     } catch (err) {
       this._error = `Could not load entities: ${this._formatError(err)}`;
     }
-    this.render();
+    this._refresh();
   }
 
   async selectEntity(entityId) {
@@ -79,7 +83,7 @@ class ActionExplorerPanel extends HTMLElement {
       this._actions = [];
       this._error = `Could not load actions: ${this._formatError(err)}`;
     }
-    this.render();
+    this._refresh();
   }
 
   async generateAutomation(action) {
@@ -97,25 +101,12 @@ class ActionExplorerPanel extends HTMLElement {
       this._automationYaml = "";
       this._error = `Could not generate automation: ${this._formatError(err)}`;
     }
-    this.render();
+    this._refresh();
   }
 
-  _saveScrollY() {
-    const list = this.shadowRoot?.querySelector?.(".list");
-    return list ? list.scrollTop : undefined;
-  }
+  /* ---- one-time layout ---- */
 
-  _restoreScrollY(y) {
-    if (y === undefined) return;
-    const list = this.shadowRoot?.querySelector?.(".list");
-    if (list) list.scrollTop = y;
-  }
-
-  render() {
-    if (!this.shadowRoot) return;
-    const _scrollY = this._saveScrollY();
-    this.shadowRoot.replaceChildren();
-    this._restoreScrollY(_scrollY);
+  _buildLayout() {
     const style = document.createElement("style");
     style.textContent = `
       :host { display: block; min-height: 100vh; color: var(--primary-text-color, #1f2933); background: var(--primary-background-color, #f5f7fb); font-family: var(--paper-font-body1_-_font-family, system-ui, sans-serif); }
@@ -149,21 +140,26 @@ class ActionExplorerPanel extends HTMLElement {
     hero.append(createElement("p", "", "Pick any Home Assistant entity, inspect supported actions, then generate a validated starter automation."));
     wrap.append(hero);
 
-    if (this._error) wrap.append(createElement("div", "error", this._error));
+    this._errorEl = createElement("div", "error");
+    this._errorEl.style.display = "none";
+    wrap.append(this._errorEl);
 
     const grid = createElement("section", "grid");
-    grid.append(this.renderEntityCard());
-    grid.append(this.renderActionCard());
+    grid.append(this._buildEntityCard());
+    grid.append(this._buildActionCard());
     wrap.append(grid);
     this.shadowRoot.append(wrap);
   }
 
-  renderEntityCard() {
+  /* ---- entity list ---- */
+
+  _buildEntityCard() {
     const card = createElement("aside", "card");
+
     const searchSection = createElement("div", "section");
     const input = createElement("input", "search");
     input.placeholder = "Search entities, e.g. kitchen light";
-    input.value = this._query;
+    input.value = "";
     input.addEventListener("input", (event) => {
       this._query = event.target.value;
       clearTimeout(this._searchTimer);
@@ -172,7 +168,24 @@ class ActionExplorerPanel extends HTMLElement {
     searchSection.append(input);
     card.append(searchSection);
 
-    const list = createElement("div", "list");
+    this._listEl = createElement("div", "list");
+    card.append(this._listEl);
+
+    this._populateEntityList();
+    return card;
+  }
+
+  _populateEntityList() {
+    if (!this._listEl) return;
+    this._listEl.textContent = "";
+
+    if (this._error) {
+      this._errorEl.textContent = this._error;
+      this._errorEl.style.display = "";
+    } else {
+      this._errorEl.style.display = "none";
+    }
+
     for (const entity of this._entities) {
       const button = createElement("button", `entity${entity.entity_id === this._selected ? " selected" : ""}`);
       button.type = "button";
@@ -180,25 +193,48 @@ class ActionExplorerPanel extends HTMLElement {
       button.append(createElement("strong", "", entity.name));
       button.append(createElement("span", "entity-id muted", entity.entity_id));
       button.append(createElement("span", "muted", `${entity.domain} · ${entity.state}`));
-      list.append(button);
+      this._listEl.append(button);
     }
-    if (!this._entities.length) list.append(createElement("div", "section muted", "No entities loaded yet."));
-    card.append(list);
-    return card;
+
+    if (!this._entities.length) {
+      this._listEl.append(createElement("div", "section muted", "No entities loaded yet."));
+    }
   }
 
-  renderActionCard() {
+  /* ---- action card ---- */
+
+  _buildActionCard() {
     const card = createElement("section", "card");
     const header = createElement("div", "section");
-    header.append(createElement("h2", "", this._selected ? `Actions for ${this._selected}` : "Select an entity"));
+    this._actionHeader = createElement("h2", "", "Select an entity");
+    header.append(this._actionHeader);
     header.append(createElement("p", "", "Services are ranked with common actions first. Schema fields come from Home Assistant's service registry."));
     card.append(header);
 
-    const body = createElement("div", "section actions");
+    this._actionBodyEl = createElement("div", "section actions");
+    card.append(this._actionBodyEl);
+
+    this._actionOutputEl = createElement("div", "section");
+    this._actionOutputEl.style.display = "none";
+    card.append(this._actionOutputEl);
+
+    this._populateActionCard();
+    return card;
+  }
+
+  _populateActionCard() {
+    if (!this._actionBodyEl || !this._actionHeader) return;
+
+    this._actionHeader.textContent = this._selected
+      ? `Actions for ${this._selected}`
+      : "Select an entity";
+
+    this._actionBodyEl.textContent = "";
+
     if (!this._selected) {
-      body.append(createElement("p", "muted", "Choose an entity from the left to see what it can do."));
+      this._actionBodyEl.append(createElement("p", "muted", "Choose an entity from the left to see what it can do."));
     } else if (!this._actions.length) {
-      body.append(createElement("p", "muted", "No actions found for this entity domain."));
+      this._actionBodyEl.append(createElement("p", "muted", "No actions found for this entity domain."));
     } else {
       for (const action of this._actions) {
         const row = createElement("article", "action");
@@ -211,18 +247,25 @@ class ActionExplorerPanel extends HTMLElement {
         button.type = "button";
         button.addEventListener("click", () => this.generateAutomation(action));
         row.append(text, button);
-        body.append(row);
+        this._actionBodyEl.append(row);
       }
     }
-    card.append(body);
 
     if (this._automationYaml) {
-      const output = createElement("div", "section");
-      output.append(createElement("h2", "", "Starter automation YAML"));
-      output.append(createElement("pre", "", this._automationYaml));
-      card.append(output);
+      this._actionOutputEl.style.display = "";
+      this._actionOutputEl.textContent = "";
+      this._actionOutputEl.append(createElement("h2", "", "Starter automation YAML"));
+      this._actionOutputEl.append(createElement("pre", "", this._automationYaml));
+    } else {
+      this._actionOutputEl.style.display = "none";
     }
-    return card;
+  }
+
+  /* ---- in-place refresh (no DOM replacement) ---- */
+
+  _refresh() {
+    this._populateEntityList();
+    this._populateActionCard();
   }
 }
 
