@@ -1,6 +1,6 @@
 import { formatFieldCount } from "./utils.js";
 
-const API_BASE = "/action_explorer";
+const API_BASE = "action_explorer";
 
 export function createElement(tag, className, text) {
   const node = document.createElement(tag);

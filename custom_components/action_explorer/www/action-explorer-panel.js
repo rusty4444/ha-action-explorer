@@ -5,7 +5,7 @@ function formatFieldCount(fields = {}) {
 }
 
 // src/action-explorer-panel.js
-var API_BASE = "/action_explorer";
+var API_BASE = "action_explorer";
 function createElement(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;

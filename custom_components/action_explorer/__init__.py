@@ -142,7 +142,7 @@ def _service_call_yaml(alias: str, entity_id: str, service: str, service_data: d
 class ActionExplorerEntitiesView(HomeAssistantView):
     """Return searchable entity summaries."""
 
-    url = "/action_explorer/entities"
+    url = "/api/action_explorer/entities"
     name = "api:action_explorer:entities"
     requires_auth = True
 
@@ -266,7 +266,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         module_url=f"{STATIC_URL}/action-explorer-panel.js?v={VERSION}",
         embed_iframe=False,
         require_admin=False,
-        config={"apiBase": "/action_explorer"},
+        config={"apiBase": "action_explorer"},
     )
     return True
 
