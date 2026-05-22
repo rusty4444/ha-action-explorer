@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 import json
 from typing import Any
@@ -13,6 +14,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, PANEL_NAME, PANEL_URL_PATH, STATIC_URL, VERSION
+
+_LOGGER = logging.getLogger(__name__)
 
 PLATFORMS: list[str] = []
 
@@ -243,31 +246,47 @@ class ActionExplorerAutomationView(HomeAssistantView):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Action Explorer from a config entry."""
-    await hass.http.async_register_static_paths(
-        [
-            StaticPathConfig(
-                STATIC_URL,
-                hass.config.path("custom_components/action_explorer/www"),
-                cache_headers=True,
-            )
-        ]
-    )
+    try:
+        await hass.http.async_register_static_paths(
+            [
+                StaticPathConfig(
+                    STATIC_URL,
+                    hass.config.path("custom_components/action_explorer/www"),
+                    cache_headers=True,
+                )
+            ]
+        )
+    except Exception:
+        _LOGGER.error("Failed to register static paths for Action Explorer", exc_info=True)
+        await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+        raise
 
-    hass.http.register_view(ActionExplorerEntitiesView)
-    hass.http.register_view(ActionExplorerActionsView)
-    hass.http.register_view(ActionExplorerAutomationView)
+    try:
+        hass.http.register_view(ActionExplorerEntitiesView)
+        hass.http.register_view(ActionExplorerActionsView)
+        hass.http.register_view(ActionExplorerAutomationView)
+    except Exception:
+        _LOGGER.error("Failed to register HTTP views for Action Explorer", exc_info=True)
+        await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+        raise
 
-    await panel_custom.async_register_panel(
-        hass,
-        frontend_url_path=PANEL_URL_PATH,
-        webcomponent_name=PANEL_NAME,
-        sidebar_title="Action Explorer",
-        sidebar_icon="mdi:gesture-tap-button",
-        module_url=f"{STATIC_URL}/action-explorer-panel.js?v={VERSION}",
-        embed_iframe=False,
-        require_admin=False,
-        config={"apiBase": "action_explorer"},
-    )
+    try:
+        await panel_custom.async_register_panel(
+            hass,
+            frontend_url_path=PANEL_URL_PATH,
+            webcomponent_name=PANEL_NAME,
+            sidebar_title="Action Explorer",
+            sidebar_icon="mdi:gesture-tap-button",
+            module_url=f"{STATIC_URL}/action-explorer-panel.js?v={VERSION}",
+            embed_iframe=False,
+            require_admin=False,
+            config={"apiBase": "action_explorer"},
+        )
+    except Exception:
+        _LOGGER.error("Failed to register Action Explorer panel", exc_info=True)
+        await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+        raise
+
     return True
 
 
