@@ -257,7 +257,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.http.register_view(ActionExplorerActionsView)
     hass.http.register_view(ActionExplorerAutomationView)
 
-    panel_custom.async_register_panel(
+    await panel_custom.async_register_panel(
         hass,
         frontend_url_path=PANEL_URL_PATH,
         webcomponent_name=PANEL_NAME,
