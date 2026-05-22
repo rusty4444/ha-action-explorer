@@ -142,7 +142,7 @@ def _service_call_yaml(alias: str, entity_id: str, service: str, service_data: d
 class ActionExplorerEntitiesView(HomeAssistantView):
     """Return searchable entity summaries."""
 
-    url = "/api/action_explorer/entities"
+    url = "/action_explorer/entities"
     name = "api:action_explorer:entities"
     requires_auth = True
 
@@ -171,7 +171,7 @@ class ActionExplorerEntitiesView(HomeAssistantView):
 class ActionExplorerActionsView(HomeAssistantView):
     """Return supported services and examples for one entity."""
 
-    url = "/api/action_explorer/actions/{entity_id}"
+    url = "/action_explorer/actions/{entity_id}"
     name = "api:action_explorer:actions"
     requires_auth = True
 
@@ -194,7 +194,7 @@ class ActionExplorerActionsView(HomeAssistantView):
 class ActionExplorerAutomationView(HomeAssistantView):
     """Generate a validated automation snippet for a service call."""
 
-    url = "/api/action_explorer/automation"
+    url = "/action_explorer/automation"
     name = "api:action_explorer:automation"
     requires_auth = True
 
