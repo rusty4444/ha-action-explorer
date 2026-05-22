@@ -21,3 +21,11 @@
   diagram, quick-start table, example entity/action cheat sheet, and
   troubleshooting FAQ.
 
+
+
+## [0.1.4] – 2026-05-22
+
+### Fixed
+- Entity list scroll position resetting to top when `render()` rebuilds the DOM.
+  `render()` now captures `scrollTop` before `shadowRoot.replaceChildren()` and
+  restores it immediately after, so scrolling is preserved across search re-renders.

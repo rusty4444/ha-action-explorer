@@ -95,9 +95,20 @@ var ActionExplorerPanel = class extends HTMLElement {
     }
     this.render();
   }
+  _saveScrollY() {
+    const list = this.shadowRoot?.querySelector?.(".list");
+    return list ? list.scrollTop : void 0;
+  }
+  _restoreScrollY(y) {
+    if (y === void 0) return;
+    const list = this.shadowRoot?.querySelector?.(".list");
+    if (list) list.scrollTop = y;
+  }
   render() {
     if (!this.shadowRoot) return;
+    const _scrollY = this._saveScrollY();
     this.shadowRoot.replaceChildren();
+    this._restoreScrollY(_scrollY);
     const style = document.createElement("style");
     style.textContent = `
       :host { display: block; min-height: 100vh; color: var(--primary-text-color, #1f2933); background: var(--primary-background-color, #f5f7fb); font-family: var(--paper-font-body1_-_font-family, system-ui, sans-serif); }
