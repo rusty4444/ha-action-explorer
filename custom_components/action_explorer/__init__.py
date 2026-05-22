@@ -171,7 +171,7 @@ class ActionExplorerEntitiesView(HomeAssistantView):
 class ActionExplorerActionsView(HomeAssistantView):
     """Return supported services and examples for one entity."""
 
-    url = "/action_explorer/actions/{entity_id}"
+    url = "/api/action_explorer/actions/{entity_id}"
     name = "api:action_explorer:actions"
     requires_auth = True
 
@@ -194,7 +194,7 @@ class ActionExplorerActionsView(HomeAssistantView):
 class ActionExplorerAutomationView(HomeAssistantView):
     """Generate a validated automation snippet for a service call."""
 
-    url = "/action_explorer/automation"
+    url = "/api/action_explorer/automation"
     name = "api:action_explorer:automation"
     requires_auth = True
 
