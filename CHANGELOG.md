@@ -42,3 +42,13 @@
   `_populateActionCard()` that only modify the text content of specific
   container elements. The `<div class="list">` element is never replaced,
   so its scroll position is naturally preserved.
+
+
+## [0.1.6] – 2026-05-25
+
+### Fixed
+- Added defensive setup logging around static path, HTTP view, and custom panel
+  registration. If setup fails, Home Assistant now gets a full traceback in the
+  log and the config entry is unloaded cleanly before the original exception is
+  re-raised. This makes sidebar panel setup failures diagnosable instead of
+  leaving users with a missing panel and no useful log output.
