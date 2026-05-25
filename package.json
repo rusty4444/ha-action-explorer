@@ -10,7 +10,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
-    "esbuild": "0.25.12"
+    "esbuild": "0.28.0"
   },
   "type": "module"
 }
