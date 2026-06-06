@@ -9,7 +9,7 @@
     "screenshot": "node scripts/make-screenshot.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.56.1",
+    "@playwright/test": "1.60.0",
     "esbuild": "0.28.0"
   },
   "type": "module"
